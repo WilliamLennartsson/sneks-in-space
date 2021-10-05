@@ -20,21 +20,17 @@ export const createGame = (props) => {
   console.log("Game props:", props);
   const ctx = props.canvas.getContext("2d");
   const player = createPlayer();
+  const enemies = [];
   let running = false;
 
   let animationFrame;
-
-  const drawBackground = () => {
-    if (!ctx) return;
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  };
 
   const start = () => {
     // BG
     drawBackground();
     console.log("Game Started");
     running = true;
+
     requestAnimationFrame(update);
   };
 
@@ -48,13 +44,35 @@ export const createGame = (props) => {
     if (!running) return;
     if (!deltaTime) return;
 
-    console.log(`player`, player)
+    console.log(`player`, player);
     if (player) {
-      player.draw(ctx);
-    } else {
-      console.log("Didnt draw player");
+      player.update(deltaTime);
     }
+
+    enemies.forEach((enemy) => {
+      enemy.update(deltaTime);
+    });
+
+    draw();
+
     // animationFrame = requestAnimationFrame(update);
+  };
+
+  const draw = () => {
+    // BG
+    drawBackground();
+    // Enemies
+    enemies.forEach((enemy) => {
+      enemy.draw(ctx);
+    });
+    // Player
+    if (player) player.draw(ctx);
+  };
+
+  const drawBackground = () => {
+    if (!ctx) return;
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   };
 
   const inputEvent = (event) => {
