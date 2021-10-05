@@ -23,16 +23,16 @@ export const createPlayer = (incomingProps) => {
   player.maxSpeed = 10;
   player.color = "#339933";
   // Player specific
-  player.projectiles = [];
+  // player.projectiles = [];
 
   player.draw = function (ctx) {
     if (ctx) {
       ctx.fillStyle = this.color;
       ctx.fillRect(this.pos.x, this.pos.y, this.size.w, this.size.h);
       // ctx.drawImage(spriteImage, this.pos.x, this.pos.y)
-      this.projectiles.forEach((projectile) => {
-        projectile.draw(ctx);
-      });
+      // this.projectiles.forEach((projectile) => {
+      //   projectile.draw(ctx);
+      // });
     }
   };
 
@@ -40,11 +40,11 @@ export const createPlayer = (incomingProps) => {
     this.pos.x += this.dir.x * this.maxSpeed;
     this.pos.y += this.dir.y * this.maxSpeed;
 
-    removeDeadEntities(this.projectiles)
+    // removeDeadEntities(this.projectiles)
 
-    this.projectiles.forEach((projectile) => {
-      projectile.update(deltaTime);
-    });
+    // this.projectiles.forEach((projectile) => {
+    //   projectile.update(deltaTime);
+    // });
 
   };
 
@@ -69,7 +69,8 @@ export const createPlayer = (incomingProps) => {
 
   player.fireProjectile = function () {
     const projectile = createProjectile(this);
-    this.projectiles.push(projectile);
+    // this.projectiles.push(projectile);
+    if (this.onShot) this.onShot(projectile)
   };
 
   return player;

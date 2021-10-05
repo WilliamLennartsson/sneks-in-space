@@ -20,7 +20,7 @@ export const useFakeLoader = () => {
 
 export const createGame = (props) => {
   console.log("Game props:", props);
-  
+
   const { canvas } = props;
   const ctx = canvas.getContext("2d");
   const { width, height } = canvas;
@@ -29,6 +29,9 @@ export const createGame = (props) => {
 
   const player = createPlayer();
   entityManager.add(player);
+  player.onShot = function(projectile) {
+    entityManager.add(projectile)
+  }
 
   let running = false;
 
