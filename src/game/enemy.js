@@ -11,15 +11,8 @@ const defaultEnemyProps = {
 
 export const createEnemy = (incomingProps) => {
   const props = Object.assign(defaultEnemyProps, incomingProps)
-  console.log(`Enemy props: `, props)
   
-  const enemy = new Entity();
-  enemy.pos = { x: 0, y: 0 };
-  enemy.size = { w: 15, h: 15 };
-  enemy.dir = { x: 0, y: 0 };
-  enemy.rotation = {}; // Not needed for now
-  enemy.maxSpeed = 10;
-  enemy.color = "#993399";
+  const enemy = new Entity(props);
 
   enemy.draw = function (ctx) {
     ctx.fillStyle = this.color;

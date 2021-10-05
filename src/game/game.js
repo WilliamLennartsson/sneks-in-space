@@ -24,14 +24,14 @@ export const createGame = (props) => {
   let running = false;
 
   let animationFrame;
+  let previousTime = 0;
 
   const start = () => {
     // BG
     drawBackground();
     console.log("Game Started");
     running = true;
-
-    requestAnimationFrame(update);
+    requestAnimationFrame(() => { update(0) });
   };
 
   const stop = () => {
@@ -40,11 +40,10 @@ export const createGame = (props) => {
     cancelAnimationFrame(animationFrame);
   };
 
-  const update = (deltaTime) => {
+  const update = (elapsedTime) => {
+    const deltaTime = elapsedTime - previousTime
     if (!running) return;
-    if (!deltaTime) return;
 
-    console.log(`player`, player);
     if (player) {
       player.update(deltaTime);
     }
@@ -55,7 +54,8 @@ export const createGame = (props) => {
 
     draw();
 
-    // animationFrame = requestAnimationFrame(update);
+    previousTime = elapsedTime
+    animationFrame = requestAnimationFrame(update);
   };
 
   const draw = () => {
@@ -76,42 +76,19 @@ export const createGame = (props) => {
   };
 
   const inputEvent = (event) => {
-    console.log("Event code: ", event.code);
     const code = event.code;
-
-    let dir = { x: 0, y: 0 };
-    if (code === "KeyA") {
-      dir.x -= 1;
+    if (event.type == 'Digit1' && code == 'keydown') {
+      spawnEnemy()
     }
-    if (code === "KeyS") {
-      dir.y += 1;
-    }
-    if (code === "KeyD") {
-      dir.x += 1;
-    }
-    if (code === "KeyW") {
-      dir.y -= 1;
-    }
-
-    player.dir.x = dir.x;
-    player.dir.y = dir.y;
-
-    switch (code) {
-      // Movement
-      case "KeyA":
-      case "KeyS":
-      case "KeyD":
-      case "KeyW":
-      // Shoot
-      case "Space":
-      // Spells or items
-      case "Digit1":
-      case "Digit2":
-      case "Digit3":
-      default:
-        break;
-    }
+    player.handleEvent(event, code)
+    // ui.handleEvent(event, code) // TODO
+    // Is this gonna be needed?
+    // entities.forEach(entity => { entity.handleEvent(event, code) })
   };
+
+  const spawnEnemy = () => {
+    
+  }
 
   // Return [ props, api ]
   return [{ player }, { start, stop, inputEvent }];
