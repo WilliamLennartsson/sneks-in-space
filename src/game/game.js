@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { createEnemy } from "./enemy";
+import EntityManager from "./EntityManager";
 import { createPlayer } from "./player";
 
 export const useFakeLoader = () => {
@@ -18,9 +20,16 @@ export const useFakeLoader = () => {
 
 export const createGame = (props) => {
   console.log("Game props:", props);
-  const ctx = props.canvas.getContext("2d");
+  
+  const { canvas } = props;
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+
+  const entityManager = new EntityManager({});
+
   const player = createPlayer();
-  const enemies = [];
+  entityManager.add(player);
+
   let running = false;
 
   let animationFrame;
@@ -31,7 +40,9 @@ export const createGame = (props) => {
     drawBackground();
     console.log("Game Started");
     running = true;
-    requestAnimationFrame(() => { update(0) });
+    requestAnimationFrame(() => {
+      update(0);
+    });
   };
 
   const stop = () => {
@@ -41,32 +52,22 @@ export const createGame = (props) => {
   };
 
   const update = (elapsedTime) => {
-    const deltaTime = elapsedTime - previousTime
+    const deltaTime = elapsedTime - previousTime;
     if (!running) return;
 
-    if (player) {
-      player.update(deltaTime);
-    }
-
-    enemies.forEach((enemy) => {
-      enemy.update(deltaTime);
-    });
+    entityManager.update(deltaTime);
 
     draw();
 
-    previousTime = elapsedTime
+    previousTime = elapsedTime;
     animationFrame = requestAnimationFrame(update);
   };
 
   const draw = () => {
     // BG
     drawBackground();
-    // Enemies
-    enemies.forEach((enemy) => {
-      enemy.draw(ctx);
-    });
-    // Player
-    if (player) player.draw(ctx);
+
+    entityManager.draw(ctx);
   };
 
   const drawBackground = () => {
@@ -77,18 +78,18 @@ export const createGame = (props) => {
 
   const inputEvent = (event) => {
     const code = event.code;
-    if (event.type == 'Digit1' && code == 'keydown') {
-      spawnEnemy()
+    if (event.type == "keydown" && code == "Digit1") {
+      const enemy = createEnemy({
+        pos: { x: Math.random() * width, y: -10 },
+        dir: { x: 0, y: 1 },
+        maxSpeed: 3,
+      });
+      entityManager.add(enemy);
+      console.log("Spawned enemy", enemy);
     }
-    player.handleEvent(event, code)
+    player.handleEvent(event, code);
     // ui.handleEvent(event, code) // TODO
-    // Is this gonna be needed?
-    // entities.forEach(entity => { entity.handleEvent(event, code) })
   };
-
-  const spawnEnemy = () => {
-    
-  }
 
   // Return [ props, api ]
   return [{ player }, { start, stop, inputEvent }];

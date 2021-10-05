@@ -1,5 +1,6 @@
 import spriteImage from "../playerSprite.png";
 import Entity from "./Entity";
+import { removeDeadEntities } from "./EntityManager";
 
 const defaultPlayerProps = {
   name: "Player",
@@ -39,9 +40,12 @@ export const createPlayer = (incomingProps) => {
     this.pos.x += this.dir.x * this.maxSpeed;
     this.pos.y += this.dir.y * this.maxSpeed;
 
+    removeDeadEntities(this.projectiles)
+
     this.projectiles.forEach((projectile) => {
       projectile.update(deltaTime);
     });
+
   };
 
   player.handleEvent = function (event, code) {
@@ -64,34 +68,42 @@ export const createPlayer = (incomingProps) => {
   };
 
   player.fireProjectile = function () {
-    const projectile = createProjectile(this)
+    const projectile = createProjectile(this);
     this.projectiles.push(projectile);
   };
 
   return player;
 };
 
-
 export const createProjectile = (entity) => {
-    const projectile = new Entity({
-      name: "projectile",
-      pos: { x: entity.pos.x, y: entity.pos.y },
-      dir: { x: 0, y: -1 },
-      maxSpeed: 5,
-      size: { w: 30, h: 30 },
-      color: '#ffffff'
-    });
+  const projectile = new Entity({
+    name: "projectile",
+    pos: { x: entity.pos.x, y: entity.pos.y },
+    dir: { x: 0, y: -1 },
+    maxSpeed: 5,
+    size: { w: 30, h: 30 },
+    color: "#ffffff",
+  });
 
-    projectile.update = function (deltaTime) {
-      this.pos.x += this.dir.x * this.maxSpeed;
-      this.pos.y += this.dir.y * this.maxSpeed;
-    };
+  projectile.lifeSpan = 150;
 
-    projectile.draw = function (ctx) {
-      ctx.fillStyle = this.color;
-      // console.log(`this.pos.x, this.pos.y, this.size.w, this.size.h`, this.pos.x, this.pos.y, this.size.w, this.size.h)
-      ctx.fillRect(this.pos.x, this.pos.y, this.size.w, this.size.h);
-    };
-    
-    return projectile
-}
+  projectile.update = function (deltaTime) {
+    if (this.isDead) return
+
+    this.pos.x += this.dir.x * this.maxSpeed;
+    this.pos.y += this.dir.y * this.maxSpeed;
+
+    this.lifeSpan--;
+    if (this.lifeSpan <= 0) {
+      this.isDead = true;
+    }
+  };
+
+  projectile.draw = function (ctx) {
+    ctx.fillStyle = this.color;
+    // console.log(`this.pos.x, this.pos.y, this.size.w, this.size.h`, this.pos.x, this.pos.y, this.size.w, this.size.h)
+    ctx.fillRect(this.pos.x, this.pos.y, this.size.w, this.size.h);
+  };
+
+  return projectile;
+};

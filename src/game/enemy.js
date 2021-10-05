@@ -21,7 +21,7 @@ export const createEnemy = (incomingProps) => {
   };
 
   enemy.update = function (deltaTime) {
-    this.pos.y += this.dir.y * this.maxSpeed * deltaTime;
+    this.pos.y += this.dir.y * this.maxSpeed;
   };
 
   return enemy;
