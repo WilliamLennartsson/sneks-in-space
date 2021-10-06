@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createEnemy } from "./enemy";
+import { createEnemy, createShootingEnemy } from "./enemy";
 import EntityManager from "./EntityManager";
 import { createPlayer } from "./player";
 
@@ -29,9 +29,9 @@ export const createGame = (props) => {
 
   const player = createPlayer();
   entityManager.add(player);
-  player.onShot = function(projectile) {
-    entityManager.add(projectile)
-  }
+  player.onShot = function (projectile) {
+    entityManager.add(projectile);
+  };
 
   let running = false;
 
@@ -88,7 +88,17 @@ export const createGame = (props) => {
         maxSpeed: 3,
       });
       entityManager.add(enemy);
-      console.log("Spawned enemy", enemy);
+      console.log("Spawned basic enemy", enemy);
+    } else if (event.type == "keydown" && code == "Digit2") {
+      const enemy = createShootingEnemy(
+        {
+          pos: { x: Math.random() * width, y: -10 },
+          dir: { x: 0, y: 1 },
+          maxSpeed: 3,
+        },
+        player
+      );
+      entityManager.add(enemy);
     }
     player.handleEvent(event, code);
     // ui.handleEvent(event, code) // TODO

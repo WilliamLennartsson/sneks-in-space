@@ -1,4 +1,5 @@
 import Entity from "./Entity";
+import { dist } from './utils'
 
 const defaultEnemyProps = {
   pos: { x: 0, y: 0 },
@@ -26,3 +27,16 @@ export const createEnemy = (incomingProps) => {
 
   return enemy;
 };
+
+export const createShootingEnemy = (incomingProps, target) => {
+  
+  const enemy = createEnemy(incomingProps)
+
+  enemy.update = function (deltaTime) {
+    if (dist(target.pos, this.pos) > 59) {
+      this.pos.y += this.dir.y * this.maxSpeed;
+    }
+  }
+
+  return enemy
+}
